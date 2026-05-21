@@ -100,8 +100,8 @@ void exibirOrdenacao(const Resultado &r) {
 
 void exibirBusca(const ResultadoBusca &r) {
     cout << "  " << left << setw(12) << r.algoritmo
-         << " | verif: " << setw(8) << r.verificacoes
-         << " | caso: " << setw(12) << r.caso
+         << " | Verificações: " << setw(8) << r.verificacoes
+         << " | Caso: " << setw(18) << r.caso
          << " | tempo: " << fixed << setprecision(6) << r.tempo << "s\n";
 }
 
@@ -111,7 +111,7 @@ int main() {
     const string arquivoBusca     = "resultado_busca.csv";
 
     ofstream(arquivoOrdenacao) << "Algoritmo,Total,Comparacoes,Trocas,Tempo(s)\n";
-    ofstream(arquivoBusca)     << "Algoritmo,Total,Caso,Verificacoes,Tempo(s)\n";
+    ofstream(arquivoBusca)     << "Algoritmo,Total,Verificações,Caso,Tempo(s)\n";
 
     cout << "Carregando dataset Olist Customers...\n";
     vector<Registro> dadosCompletos = carregarCSV(arquivoDataset);
