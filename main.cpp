@@ -144,13 +144,13 @@ int main() {
         int alvoInexistenteAntes = -1;
 
         vector<ResultadoBusca> buscaAntes = {
-            buscaSequencial(fatia, alvoPrimeiroAntes, "Primeiro"),
-            buscaSequencial(fatia, alvoMeioAntes, "Meio"),
-            buscaSequencial(fatia, alvoInexistenteAntes, "Inexistente"),
+            buscaSequencial(fatia, alvoPrimeiroAntes, "Primeiro_Antes"),
+            buscaSequencial(fatia, alvoMeioAntes, "Meio_Antes"),
+            buscaSequencial(fatia, alvoInexistenteAntes, "Inexistente_Antes"),
 
-            buscaBinaria(fatia, alvoPrimeiroAntes, "Primeiro"),
-            buscaBinaria(fatia, alvoMeioAntes, "Meio"),
-            buscaBinaria(fatia, alvoInexistenteAntes, "Inexistente")
+            buscaBinaria(fatia, alvoPrimeiroAntes, "Primeiro_Antes"),
+            buscaBinaria(fatia, alvoMeioAntes, "Meio_Antes"),
+            buscaBinaria(fatia, alvoInexistenteAntes, "Inexistente_Antes")
         };
         for (const auto &r : buscaAntes) exibirBusca(r);
         salvarBuscaCSV(arquivoBusca, buscaAntes, tamanho);
@@ -176,13 +176,13 @@ int main() {
         int alvoInexistenteDepois = -1;
 
         vector<ResultadoBusca> buscaDepois = {
-            buscaSequencial(ordenado, alvoPrimeiroDepois, "Primeiro"),
-            buscaSequencial(ordenado, alvoMeioDepois, "Meio"),
-            buscaSequencial(ordenado, alvoInexistenteDepois, "Inexistente"),
+            buscaSequencial(ordenado, alvoPrimeiroDepois, "Primeiro_Depois"),
+            buscaSequencial(ordenado, alvoMeioDepois, "Meio_Depois"),
+            buscaSequencial(ordenado, alvoInexistenteDepois, "Inexistente_Depois"),
 
-            buscaBinaria(ordenado, alvoPrimeiroDepois, "Primeiro"),
-            buscaBinaria(ordenado, alvoMeioDepois, "Meio"),
-            buscaBinaria(ordenado, alvoInexistenteDepois, "Inexistente")
+            buscaBinaria(ordenado, alvoPrimeiroDepois, "Primeiro_Depois"),
+            buscaBinaria(ordenado, alvoMeioDepois, "Meio_Depois"),
+            buscaBinaria(ordenado, alvoInexistenteDepois, "Inexistente_Depois")
         };
 
         for (const auto &r : buscaDepois) exibirBusca(r);
