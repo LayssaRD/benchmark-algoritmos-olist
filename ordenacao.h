@@ -22,7 +22,6 @@ Resultado mergeSort     (std::vector<Registro> arr);
 Resultado radixSort     (std::vector<Registro> arr);
 Resultado heapSort      (std::vector<Registro> arr);
 
-// Versão que retorna o vetor ordenado (usada na busca)
 std::vector<Registro> mergeSortOrdenado(std::vector<Registro> arr);
 
 #endif

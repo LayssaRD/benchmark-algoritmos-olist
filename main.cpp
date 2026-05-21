@@ -9,18 +9,15 @@
 
 using namespace std;
 
-// ─────────────────────────────────────────────────────────────
 // Leitura do CSV — Olist Customers Dataset
-//
+
 // Colunas:
-//   [0] customer_id            → ignorado na ordenação
-//   [1] customer_unique_id     → ignorado
-//   [2] customer_zip_code_prefix → zipCode (int) ← CHAVE
-//   [3] customer_city          → city
-//   [4] customer_state         → state
-//
-// O CSV pode ter campos com ou sem aspas duplas — ambos tratados.
-// ─────────────────────────────────────────────────────────────
+//   [0] customer_id                → ignorado na ordenação
+//   [1] customer_unique_id         → código único do cliente
+//   [2] customer_zip_code_prefix   → zipCode (int) ← CHAVE
+//   [3] customer_city              → city
+//   [4] customer_state             → state
+
 static string limparAspas(const string &s) {
     if (s.size() >= 2 && s.front() == '"' && s.back() == '"')
         return s.substr(1, s.size() - 2);
@@ -36,11 +33,10 @@ vector<Registro> carregarCSV(const string &caminho) {
     }
 
     string linha;
-    getline(arquivo, linha); // ignora cabeçalho
+    getline(arquivo, linha);
 
     int id = 0;
     while (getline(arquivo, linha)) {
-        // Parser simples: separa por vírgula respeitando aspas
         vector<string> campos;
         string campo;
         bool dentroAspas = false;
@@ -55,7 +51,7 @@ vector<Registro> carregarCSV(const string &caminho) {
                 campo += c;
             }
         }
-        campos.push_back(limparAspas(campo)); // último campo
+        campos.push_back(limparAspas(campo));
 
         if (campos.size() < 5) continue;
 
@@ -76,9 +72,6 @@ vector<Registro> carregarCSV(const string &caminho) {
     return dados;
 }
 
-// ─────────────────────────────────────────────────────────────
-// Salvamento dos resultados
-// ─────────────────────────────────────────────────────────────
 void salvarOrdenacaoCSV(const string &caminho,
                         const vector<Resultado> &resultados, int total) {
     ofstream f(caminho, ios::app);
@@ -92,14 +85,12 @@ void salvarBuscaCSV(const string &caminho,
                     const vector<ResultadoBusca> &resultados, int total) {
     ofstream f(caminho, ios::app);
     for (const auto &r : resultados)
-        f << r.algoritmo << "," << total << "," << r.caso << ","
+        f << r.algoritmo << "," << total << ","
           << r.verificacoes << ","
+          << r.caso << ","
           << fixed << setprecision(6) << r.tempo << "\n";
 }
 
-// ─────────────────────────────────────────────────────────────
-// Exibição no console
-// ─────────────────────────────────────────────────────────────
 void exibirOrdenacao(const Resultado &r) {
     cout << "  " << left  << setw(20) << r.algoritmo
          << " | comp: "   << setw(12) << r.comparacoes
@@ -109,24 +100,19 @@ void exibirOrdenacao(const Resultado &r) {
 
 void exibirBusca(const ResultadoBusca &r) {
     cout << "  " << left << setw(12) << r.algoritmo
-         << " [" << setw(7) << r.caso << "]"
          << " | verif: " << setw(8) << r.verificacoes
+         << " | caso: " << setw(12) << r.caso
          << " | tempo: " << fixed << setprecision(6) << r.tempo << "s\n";
 }
 
-// ─────────────────────────────────────────────────────────────
-// Main
-// ─────────────────────────────────────────────────────────────
 int main() {
     const string arquivoDataset   = "olist_customers_dataset.csv";
     const string arquivoOrdenacao = "resultado_ordenacao.csv";
     const string arquivoBusca     = "resultado_busca.csv";
 
-    // Cria/limpa arquivos de saída com cabeçalho
     ofstream(arquivoOrdenacao) << "Algoritmo,Total,Comparacoes,Trocas,Tempo(s)\n";
     ofstream(arquivoBusca)     << "Algoritmo,Total,Caso,Verificacoes,Tempo(s)\n";
 
-    // ── Carregamento completo ────────────────────────────────
     cout << "Carregando dataset Olist Customers...\n";
     vector<Registro> dadosCompletos = carregarCSV(arquivoDataset);
     int totalCompleto = (int)dadosCompletos.size();
@@ -145,38 +131,30 @@ int main() {
 
     for (int tamanho : tamanhos) {
 
-        // Fatia do vetor original (mantém ordem de inserção do CSV)
         vector<Registro> fatia(dadosCompletos.begin(),
                                dadosCompletos.begin() + tamanho);
 
-        cout << "========================================\n";
         cout << "BLOCO: " << tamanho << " registros\n";
         cout << "========================================\n";
 
-        // ── BUSCA SEQUENCIAL — vetor ORIGINAL (não ordenado) ─
-        // Enunciado seção 4 item 2:
-        // "Busca Sequencial ANTES de ordenar (melhor, médio e pior caso)"
-        //
-        // Melhor caso: alvo na posição 0   → 1 verificação (garantido)
-        // Caso médio : alvo na posição n/2 → ~n/2 verificações
-        // Pior caso  : alvo na posição n-1 → n verificações (garantido)
-        cout << "\n[Busca Sequencial — vetor ORIGINAL (nao ordenado)]\n";
+        cout << "\n[Busca — vetor ORIGINAL (nao ordenado)]\n";
 
-        int alvoMelhorSeq = fatia[0].zipCode;
-        int alvoMedioSeq  = fatia[tamanho / 2].zipCode;
-        int alvoPiorSeq   = -1;  // Elemento que NÃO existe no array
+        int alvoPrimeiroAntes = fatia[0].zipCode;
+        int alvoMeioAntes = fatia[(tamanho - 1) / 2].zipCode;
+        int alvoInexistenteAntes = -1;
 
-        vector<ResultadoBusca> resBuscaAntes = {
-            buscaSequencial(fatia, alvoMelhorSeq, "Melhor"),
-            buscaSequencial(fatia, alvoMedioSeq,  "Medio"),
-            buscaSequencial(fatia, alvoPiorSeq,   "Pior")
+        vector<ResultadoBusca> buscaAntes = {
+            buscaSequencial(fatia, alvoPrimeiroAntes, "Primeiro"),
+            buscaSequencial(fatia, alvoMeioAntes, "Meio"),
+            buscaSequencial(fatia, alvoInexistenteAntes, "Inexistente"),
+
+            buscaBinaria(fatia, alvoPrimeiroAntes, "Primeiro"),
+            buscaBinaria(fatia, alvoMeioAntes, "Meio"),
+            buscaBinaria(fatia, alvoInexistenteAntes, "Inexistente")
         };
-        for (const auto &r : resBuscaAntes) exibirBusca(r);
-        salvarBuscaCSV(arquivoBusca, resBuscaAntes, tamanho);
+        for (const auto &r : buscaAntes) exibirBusca(r);
+        salvarBuscaCSV(arquivoBusca, buscaAntes, tamanho);
 
-        // ── ORDENAÇÃO ────────────────────────────────────────
-        // Cada função recebe uma CÓPIA da fatia (passagem por valor)
-        // Bubble Sort por último — mais lento com n²
         cout << "\n[Algoritmos de Ordenacao — chave: zipCode (int)]\n";
 
         vector<Resultado> resOrdenacao = {
@@ -189,28 +167,26 @@ int main() {
         for (const auto &r : resOrdenacao) exibirOrdenacao(r);
         salvarOrdenacaoCSV(arquivoOrdenacao, resOrdenacao, tamanho);
 
-        // ── BUSCA BINÁRIA — vetor ORDENADO ───────────────────
-        // Enunciado seção 4 item 3:
-        // "Busca Binária APÓS a ordenação para os mesmos itens"
-        //
-        // Melhor caso bin.: alvo no centro     → 1 comparação
-        // Caso médio bin. : alvo no 1º quartil → ~log2(n)/2 comparações
-        // Pior caso bin.  : alvo na extremidade → ceil(log2(n)) comparações
-        cout << "\n[Busca Binaria — vetor ORDENADO por zipCode]\n";
+        cout << "\n[Busca — vetor ORDENADO por zipCode]\n";
 
         vector<Registro> ordenado = mergeSortOrdenado(fatia);
 
-        int alvoMelhorBin = ordenado[(tamanho - 1) / 2].zipCode;
-        int alvoMedioBin  = ordenado[tamanho / 4].zipCode;
-        int alvoPiorBin   = -1;
+        int alvoPrimeiroDepois = ordenado[0].zipCode;
+        int alvoMeioDepois = ordenado[(tamanho - 1) / 2].zipCode;
+        int alvoInexistenteDepois = -1;
 
-        vector<ResultadoBusca> resBuscaDepois = {
-            buscaBinaria(ordenado, alvoMelhorBin, "Melhor"),
-            buscaBinaria(ordenado, alvoMedioBin,  "Medio"),
-            buscaBinaria(ordenado, alvoPiorBin,   "Pior")
+        vector<ResultadoBusca> buscaDepois = {
+            buscaSequencial(ordenado, alvoPrimeiroDepois, "Primeiro"),
+            buscaSequencial(ordenado, alvoMeioDepois, "Meio"),
+            buscaSequencial(ordenado, alvoInexistenteDepois, "Inexistente"),
+
+            buscaBinaria(ordenado, alvoPrimeiroDepois, "Primeiro"),
+            buscaBinaria(ordenado, alvoMeioDepois, "Meio"),
+            buscaBinaria(ordenado, alvoInexistenteDepois, "Inexistente")
         };
-        for (const auto &r : resBuscaDepois) exibirBusca(r);
-        salvarBuscaCSV(arquivoBusca, resBuscaDepois, tamanho);
+
+        for (const auto &r : buscaDepois) exibirBusca(r);
+        salvarBuscaCSV(arquivoBusca, buscaDepois, tamanho);
 
         cout << "\n";
     }

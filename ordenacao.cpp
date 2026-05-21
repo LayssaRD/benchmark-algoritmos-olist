@@ -1,16 +1,8 @@
 #include "ordenacao.h"
-#include <ctime>
+#include <chrono>
 #include <algorithm>
 #include <vector>
 using namespace std;
-
-// ─────────────────────────────────────────────────────────────
-// NOTA GERAL DE CORREÇÕES:
-//  1. Chave: zipCode (int) — prefixo de CEP, sem bug de comparação
-//  2. Insertion/Shell: troca++ dentro do while (conta cada movimentação)
-//  3. Radix: toda movimentação para saida[] conta como troca
-//  4. Merge: contagem de trocas baseada em movimentações reais
-// ─────────────────────────────────────────────────────────────
 
 
 // ── Bubble Sort ──────────────────────────────────────────────
@@ -18,7 +10,7 @@ using namespace std;
 Resultado bubbleSort(vector<Registro> arr) {
     int n = arr.size();
     long long comp = 0, troca = 0;
-    clock_t ini = clock();
+    auto ini = chrono::high_resolution_clock::now();
 
     for (int i = 0; i < n - 1; i++)
         for (int j = 0; j < n - 1 - i; j++) {
@@ -29,17 +21,17 @@ Resultado bubbleSort(vector<Registro> arr) {
             }
         }
 
-    return {"Bubble Sort", comp, troca, (double)(clock()-ini)/CLOCKS_PER_SEC};
+    auto fim = chrono::high_resolution_clock::now();
+    return {"Bubble Sort", comp, troca, chrono::duration<double>(fim - ini).count()};
 }
 
 // ── Insertion Sort ───────────────────────────────────────────
 // Complexidade: O(n²) — eficiente para dados quase ordenados
-// CORREÇÃO: troca++ dentro do while — conta cada deslocamento individual
 Resultado insertionSort(vector<Registro> arr) {
     int n = arr.size();
     long long comp = 0;
     long long troca = 0;
-    clock_t ini = clock();
+    auto ini = chrono::high_resolution_clock::now();
 
     for (int i = 1; i < n; i++) {
         Registro chave = arr[i];
@@ -58,8 +50,8 @@ Resultado insertionSort(vector<Registro> arr) {
             troca++;
     }
 
-    clock_t fim = clock();
-    return {"Insertion Sort", comp, troca, (double)(fim - ini) / CLOCKS_PER_SEC};
+    auto fim = chrono::high_resolution_clock::now();
+    return {"Insertion Sort", comp, troca, chrono::duration<double>(fim - ini).count()};
 }
 
 // ── Selection Sort ───────────────────────────────────────────
@@ -67,7 +59,7 @@ Resultado insertionSort(vector<Registro> arr) {
 Resultado selectionSort(vector<Registro> arr) {
     int n = arr.size();
     long long comp = 0, troca = 0;
-    clock_t ini = clock();
+    auto ini = chrono::high_resolution_clock::now();
 
     for (int i = 0; i < n - 1; i++) {
         int menor = i;
@@ -82,16 +74,16 @@ Resultado selectionSort(vector<Registro> arr) {
         }
     }
 
-    return {"Selection Sort", comp, troca, (double)(clock()-ini)/CLOCKS_PER_SEC};
+    auto fim = chrono::high_resolution_clock::now();
+    return {"Selection Sort", comp, troca, chrono::duration<double>(fim - ini).count()};
 }
 
 // ── Shell Sort ───────────────────────────────────────────────
 // Complexidade: depende da sequência de gaps — aprox. O(n log² n)
-// CORREÇÃO: troca++ dentro do while — conta cada deslocamento individual
 Resultado shellSort(vector<Registro> arr) {
     int n = arr.size();
     long long comp = 0, troca = 0;
-    clock_t ini = clock();
+    auto ini = chrono::high_resolution_clock::now();
 
     for (int gap = n/2; gap > 0; gap /= 2) {
         for (int i = gap; i < n; i++) {
@@ -112,7 +104,8 @@ Resultado shellSort(vector<Registro> arr) {
         }
     }
 
-    return {"Shell Sort", comp, troca, (double)(clock() - ini) / CLOCKS_PER_SEC};
+    auto fim = chrono::high_resolution_clock::now();
+    return {"Shell Sort", comp, troca, chrono::duration<double>(fim - ini).count()};
 }
 
 // ── Quick Sort Lomuto ────────────────────────────────────────
@@ -143,9 +136,10 @@ static void qsLomuto(vector<Registro> &arr, int ini, int fim,
 
 Resultado lomuto(vector<Registro> arr) {
     long long comp = 0, troca = 0;
-    clock_t ini = clock();
+    auto ini = chrono::high_resolution_clock::now();
     qsLomuto(arr, 0, (int)arr.size()-1, comp, troca);
-    return {"QuickSort Lomuto", comp, troca, (double)(clock()-ini)/CLOCKS_PER_SEC};
+    auto fim = chrono::high_resolution_clock::now();
+    return {"QuickSort Lomuto", comp, troca, chrono::duration<double>(fim - ini).count()};
 }
 
 // ── Quick Sort Hoare ─────────────────────────────────────────
@@ -174,14 +168,14 @@ static void qsHoare(vector<Registro> &arr, int ini, int fim,
 
 Resultado hoare(vector<Registro> arr) {
     long long comp = 0, troca = 0;
-    clock_t ini = clock();
+    auto ini = chrono::high_resolution_clock::now();
     qsHoare(arr, 0, (int)arr.size()-1, comp, troca);
-    return {"QuickSort Hoare", comp, troca, (double)(clock()-ini)/CLOCKS_PER_SEC};
+    auto fim = chrono::high_resolution_clock::now();
+    return {"QuickSort Hoare", comp, troca, chrono::duration<double>(fim - ini).count()};
 }
 
 // ── Merge Sort ───────────────────────────────────────────────
 // Complexidade: O(n log n) garantido em todos os casos
-// CORREÇÃO: troca++ conta cada elemento movido para o vetor final
 static void mergeFn(vector<Registro> &arr, int ini, int meio, int fim,
                     long long &comp, long long &troca) {
     vector<Registro> esq(arr.begin()+ini, arr.begin()+meio+1);
@@ -225,9 +219,10 @@ static void ms(vector<Registro> &arr, int ini, int fim,
 
 Resultado mergeSort(vector<Registro> arr) {
     long long comp = 0, troca = 0;
-    clock_t ini = clock();
+    auto ini = chrono::high_resolution_clock::now();
     ms(arr, 0, (int)arr.size()-1, comp, troca);
-    return {"Merge Sort", comp, troca, (double)(clock()-ini)/CLOCKS_PER_SEC};
+    auto fim = chrono::high_resolution_clock::now();
+    return {"Merge Sort", comp, troca, chrono::duration<double>(fim - ini).count()};
 }
 
 vector<Registro> mergeSortOrdenado(vector<Registro> arr) {
@@ -238,11 +233,9 @@ vector<Registro> mergeSortOrdenado(vector<Registro> arr) {
 
 // ── Radix Sort ───────────────────────────────────────────────
 // Complexidade: O(d·n) onde d = número de dígitos da chave
-// Ideal para int — zipCode (CEP) já é int nativo de 5 dígitos
-// CORREÇÃO: troca++ para cada movimentação real para saida[]
 Resultado radixSort(vector<Registro> arr) {
     long long comp = 0, troca = 0;
-    clock_t ini = clock();
+    auto ini = chrono::high_resolution_clock::now();
     int n = arr.size();
     int maior = arr[0].zipCode;
 
@@ -276,7 +269,8 @@ Resultado radixSort(vector<Registro> arr) {
         }
     }
 
-    return {"Radix Sort", comp, troca, (double)(clock()-ini)/CLOCKS_PER_SEC};
+    auto fim = chrono::high_resolution_clock::now();
+    return {"Bubble Sort", comp, troca, chrono::duration<double>(fim - ini).count()};
 }
 
 // ── Heap Sort ────────────────────────────────────────────────
@@ -300,18 +294,17 @@ static void heapify(vector<Registro> &arr, int n, int i,
 Resultado heapSort(vector<Registro> arr) {
     int n = arr.size();
     long long comp = 0, troca = 0;
-    clock_t ini = clock();
+    auto ini = chrono::high_resolution_clock::now();
 
-    // Constrói o heap máximo
     for (int i = n/2 - 1; i >= 0; i--)
         heapify(arr, n, i, comp, troca);
 
-    // Extrai elementos do heap um a um
     for (int i = n-1; i >= 1; i--) {
         swap(arr[0], arr[i]);
         troca++;
         heapify(arr, i, 0, comp, troca);
     }
 
-    return {"Heap Sort", comp, troca, (double)(clock()-ini)/CLOCKS_PER_SEC};
+    auto fim = chrono::high_resolution_clock::now();
+    return {"Heap Sort", comp, troca, chrono::duration<double>(fim - ini).count()};
 }

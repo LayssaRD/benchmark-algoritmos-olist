@@ -7,17 +7,15 @@
 
 struct ResultadoBusca {
     std::string algoritmo;
-    std::string caso;
     long long   verificacoes;
     double      tempo;
+    std::string caso;
 };
 
 // Busca sequencial — funciona em vetor não ordenado (antes de ordenar)
-ResultadoBusca buscaSequencial(const std::vector<Registro> &arr,
-                               int alvo, const std::string &caso);
+ResultadoBusca buscaSequencial(const std::vector<Registro> &arr, int alvo, const std::string &caso);
 
 // Busca binária — requer vetor previamente ordenado
-ResultadoBusca buscaBinaria   (const std::vector<Registro> &arr,
-                               int alvo, const std::string &caso);
+ResultadoBusca buscaBinaria   (const std::vector<Registro> &arr, int alvo, const std::string &caso);
 
 #endif
